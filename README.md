@@ -14,6 +14,8 @@ Detect object using HC-SR04.
 Dectect Abyss using FC-51 IR Sensor.
 Control using ESP32.
 
+Requirement: 1 ESP32,1 HC-SR04,1 FC-51,5V Battery.
+
 
 
 <br/>
