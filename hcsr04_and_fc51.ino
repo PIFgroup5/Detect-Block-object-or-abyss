@@ -1,8 +1,7 @@
-
 //Connect GPIO
 #define FC1 20 //IR Sensor Front
-#define FC2 19 //IR Sensor Rear
-#define FC3 18 //IR Sensor Right
+//#define FC2 19 //IR Sensor Rear--scrap
+//#define FC3 18 //IR Sensor Right--scrap
 #define trigPin 9 // Chân kích hoạt cảm biến siêu âm (HC-SR04)
 #define echoPin 10 // Chân nhận tín hiệu cảm biến siêu âm (HC-SR04)
 
@@ -11,8 +10,8 @@
 
 //Set state
 int FR = 0; //Front IR Sensor
-int RR = 0; //Rear IR Sensor
-int R = 0; //Right IR Sensor
+//int RR = 0; //Rear IR Sensor--scrap
+//int R = 0; //Right IR Sensor--scrap
 int block = 0; //HC-SR04 Sensor
 
 //Store location
@@ -34,8 +33,8 @@ void setup() {
 
   //FC-51 Setup
   pinMode(FC1,INPUT);
-  pinMode(FC2,INPUT);
-  pinMode(FC3,INPUT);
+  //pinMode(FC2,INPUT);
+  //pinMode(FC3,INPUT);
 
   //HC-SR04 Setup
   pinMode(trigPin, OUTPUT);
@@ -59,48 +58,32 @@ void loop() {
   Serial.println();
 
   FR = digitalRead(FC1);
-  RR = digitalRead(FC2);
-  R = digitalRead(FC3);
+ // RR = digitalRead(FC2);
+  //R = digitalRead(FC3);
   if(FR == 1)
   {
     //Vehicle run (D gear)
   }
   else
   {
-    //Vehicle stop
-    if(RR==1)
-    { 
-      //Vehicle Run (R gear,backward 1m)
-      if(R==1)
-      {
-        //Vehicle steering right
-        if(FR == 1)
-        {
-          //Vehicle run
-        }
-      }
-      else
-      {
-        //Vehicle steering left
-        if(FR == 1)
-        {
-          //Vehicle run
-        }
-      }
-    }
-    else
-    {
-      //Vehicle stop
-      //print("No road,cannot continue to run.")
-    }
+    //Vehicle Stop
+    //Vehicle reverse (10 cm)
+    //Vehicle Rotate (random--code later)
+    //Vehicle Run
   }
+  
 
   //HC-SR04 (Not done yet,still need some time to research.)
   distance = getDistance();
   if (distance < BlockDistance) 
   {
     block = 1;
+    //Vehicle stop
+    //Vehicle reverse (10cm)
+    //Servo checking if left or right is empty,then switch to that direction
   }
+  else
+  {block = 0;}
 
 
 }
