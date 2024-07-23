@@ -18,4 +18,3 @@ Control using ESP32.
 
 <br/>
 
-//![image](empty)
