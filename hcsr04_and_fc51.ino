@@ -1,26 +1,28 @@
 //Connect GPIO
-#define FC1 #20 //IR Sensor Front
-#define FC2 #19 //IR Sensor Rear
-#define FC3 #18 //IR Sensor Right
-#define trigPin = 9; // Chân kích hoạt cảm biến siêu âm (HC-SR04)
-#define echoPin = 10; // Chân nhận tín hiệu cảm biến siêu âm (HC-SR04)
+#define FC1 20 //IR Sensor Front
+#define FC2 19 //IR Sensor Rear
+#define FC3 18 //IR Sensor Right
+#define trigPin 9 // Chân kích hoạt cảm biến siêu âm (HC-SR04)
+#define echoPin 10 // Chân nhận tín hiệu cảm biến siêu âm (HC-SR04)
 
 //mấy cái motor méo đứa nào setup hết dzậy?????????
 
 
 //Set state
-int FR = 0 //Front IR Sensor
-int RR = 0 //Rear IR Sensor
-int R = 0 //Right IR Sensor
-int block = 0 //HC-SR04 Sensor
+int FR = 0; //Front IR Sensor
+int RR = 0; //Rear IR Sensor
+int R = 0; //Right IR Sensor
+int block = 0; //HC-SR04 Sensor
 
 //Store location
 int targetX = 0;
 int targetY = 0;
 //Store distance
 int distance = 0;
+//For HC-SR04
 #define BlockDistance 10 //Detect distance (cm)
 #define Rotate 90 //Rotate when detect object/abyss (degrees)
+#define MAX_DISTANCE 250 //(cm)
 
 
 
@@ -100,4 +102,25 @@ void loop() {
   }
 
 
+}
+
+
+
+
+// Calculating distance
+float getDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  float duration = pulseIn(echoPin, HIGH);
+  distance = (duration / 2) * 0.0343; // (cm)
+  
+  if (distance >= MAX_DISTANCE) {
+    return MAX_DISTANCE;
+  } else {
+    return distance;
+  }
 }
