@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://raw.githubusercontent.com/Rectify11/Installer/master/logo.png">
+    <img src="none">
 </p>
 
 ---
