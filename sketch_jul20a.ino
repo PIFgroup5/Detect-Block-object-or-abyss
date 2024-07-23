@@ -1,3 +1,5 @@
+//Old data,please choose hcsr04_and_fc51 file
+
 //Connect GPIO
 #define FC1 #20 //IR Sensor Front
 #define FC2 #19 //IR Sensor Rear
