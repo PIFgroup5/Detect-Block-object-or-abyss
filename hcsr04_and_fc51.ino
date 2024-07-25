@@ -38,18 +38,6 @@ void setup() {
 }
 
 void loop() {
-
-  //User input coordinate
-  Serial.print("Enter location X: ");
-  while (!Serial.available()) ;
-  targetX = Serial.parseInt();
-  Serial.println();
-
-  Serial.print("Enter location Y: ");
-  while (!Serial.available()) ;
-  targetY = Serial.parseInt();
-  Serial.println();
-
   FR = digitalRead(FC1);
     distance = getDistance();
   if (distance < BlockDistance) 
