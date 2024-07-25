@@ -91,13 +91,13 @@ void loop() {
         else
         {
           //Vehicle stop
-          //*Can't continue to drive.*
+          //print that:*Can't continue to drive.*
         }
       }
     }
     else
     {
-      //*Can't continue to drive.*
+      //print that:*Can't continue to drive.*
     }
   }
 }
