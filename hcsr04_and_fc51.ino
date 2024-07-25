@@ -1,17 +1,13 @@
 //Connect GPIO
 #define FC1 20 //IR Sensor Front
-//#define FC2 19 //IR Sensor Rear--scrap
-//#define FC3 18 //IR Sensor Right--scrap
-#define trigPin 9 // Chân kích hoạt cảm biến siêu âm (HC-SR04)
-#define echoPin 10 // Chân nhận tín hiệu cảm biến siêu âm (HC-SR04)
-
-//mấy cái motor méo đứa nào setup hết dzậy?????????
+#define trigPin 9 // Acvtivate HC-SR04 Pin
+#define echoPin 10 // HC-SR04 Receiver pin
+//setup servo (if needed)
+//Setup motor (if needed)
 
 
 //Set state
 int FR = 0; //Front IR Sensor
-//int RR = 0; //Rear IR Sensor--scrap
-//int R = 0; //Right IR Sensor--scrap
 int block = 0; //HC-SR04 Sensor
 
 //Store location
@@ -33,20 +29,17 @@ void setup() {
 
   //FC-51 Setup
   pinMode(FC1,INPUT);
-  //pinMode(FC2,INPUT);
-  //pinMode(FC3,INPUT);
-
   //HC-SR04 Setup
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 
-  //Motor Setup (méo có motor dinhmenhdoi)
+  //Motor Setup (Need someone to code this)
 
 }
 
 void loop() {
 
-  //User input...toạ độ (méo biết từ toạ độ)
+  //User input coordinate
   Serial.print("Enter location X: ");
   while (!Serial.available()) ;
   targetX = Serial.parseInt();
@@ -58,9 +51,14 @@ void loop() {
   Serial.println();
 
   FR = digitalRead(FC1);
- // RR = digitalRead(FC2);
-  //R = digitalRead(FC3);
-  if(FR == 1)
+    distance = getDistance();
+  if (distance < BlockDistance) 
+  {
+    block = 1;
+  }
+  else
+  {block = 0;}
+  if(FR == 1,block == 0)
   {
     //Vehicle run (D gear)
   }
@@ -68,22 +66,13 @@ void loop() {
   {
     //Vehicle Stop
     //Vehicle reverse (10 cm)
-    //Vehicle Rotate (random--code later)
+    //Servo check to see if Left or right empty
+    //Vehicle Rotate 
     //Vehicle Run
   }
   
 
-  //HC-SR04 (Not done yet,still need some time to research.)
-  distance = getDistance();
-  if (distance < BlockDistance) 
-  {
-    block = 1;
-    //Vehicle stop
-    //Vehicle reverse (10cm)
-    //Servo checking if left or right is empty,then switch to that direction
-  }
-  else
-  {block = 0;}
+
 
 
 }
