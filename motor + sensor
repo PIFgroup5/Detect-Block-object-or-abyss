@@ -1,0 +1,207 @@
+#include "driver/ledc.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#define FC1 GPIO_NUM_20 // IR Sensor Front Left
+#define FC2 GPIO_NUM_19 // IR Sensor Front Right
+#define FC3 GPIO_NUM_18 // IR Sensor Back
+#define trigPin GPIO_NUM_9 // HC-SR04 Trigger Pin
+#define echoPin GPIO_NUM_10 // HC-SR04 Echo Pin
+#define ENA GPIO_NUM_25 // Enable pin for Motor A
+#define IN1 GPIO_NUM_26 // IN1 pin for Motor A
+#define IN2 GPIO_NUM_27 // IN2 pin for Motor A
+#define ENB GPIO_NUM_14 // Enable pin for Motor B
+#define IN3 GPIO_NUM_12 // IN3 pin for Motor B
+#define IN4 GPIO_NUM_13 // IN4 pin for Motor B
+#define SERVO_PIN GPIO_NUM_4 // SG90 Servo Pin
+
+#define BlockDistance 10 // Detect distance (cm)
+#define Rotate 90 // Rotate when detect object (degrees)
+#define MAX_DISTANCE 250 // Max distance (cm)
+#define MAX_DUTY 8192 // Max duty cycle for 13-bit resolution
+
+// Store state
+int FR = 0; // Front Right IR Sensor
+int FL = 0; // Front Left IR Sensor
+int BW = 0; // Back IR Sensor
+int block = 0; // HC-SR04 Sensor
+int distance = 0;
+
+// Initialize the servo PWM configuration
+void servo_init() {
+    ledc_timer_config_t ledc_timer = {
+        .duty_resolution = LEDC_TIMER_16_BIT,
+        .freq_hz = 50,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .timer_num = LEDC_TIMER_0,
+        .clk_cfg = LEDC_AUTO_CLK
+    };
+    ledc_timer_config(&ledc_timer);
+
+    ledc_channel_config_t ledc_channel = {
+        .channel = LEDC_CHANNEL_0,
+        .duty = 0,
+        .gpio_num = SERVO_PIN,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .timer_sel = LEDC_TIMER_0
+    };
+    ledc_channel_config(&ledc_channel);
+}
+
+void set_servo_angle(int angle) {
+    int duty = (angle * (MAX_DUTY - 0) / 180) + 0;
+    ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
+    ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+}
+
+// Motor control functions
+void setup_motors() {
+    gpio_set_direction(ENA, GPIO_MODE_OUTPUT);
+    gpio_set_direction(IN1, GPIO_MODE_OUTPUT);
+    gpio_set_direction(IN2, GPIO_MODE_OUTPUT);
+    gpio_set_direction(ENB, GPIO_MODE_OUTPUT);
+    gpio_set_direction(IN3, GPIO_MODE_OUTPUT);
+    gpio_set_direction(IN4, GPIO_MODE_OUTPUT);
+}
+
+void set_motor_speed(int speed) {
+    int duty = speed * (MAX_DUTY / 100);
+    ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
+    ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+}
+
+void move_forward() {
+    gpio_set_level(IN1, 1);
+    gpio_set_level(IN2, 0);
+    gpio_set_level(IN3, 1);
+    gpio_set_level(IN4, 0);
+    set_motor_speed(MAX_DUTY);
+}
+
+void move_backward() {
+    gpio_set_level(IN1, 0);
+    gpio_set_level(IN2, 1);
+    gpio_set_level(IN3, 0);
+    gpio_set_level(IN4, 1);
+    set_motor_speed(MAX_DUTY);
+}
+
+void stop_motors() {
+    gpio_set_level(IN1, 0);
+    gpio_set_level(IN2, 0);
+    gpio_set_level(IN3, 0);
+    gpio_set_level(IN4, 0);
+}
+
+void turn_right() {
+    gpio_set_level(IN1, 1);
+    gpio_set_level(IN2, 0);
+    gpio_set_level(IN3, 0);
+    gpio_set_level(IN4, 1);
+    set_motor_speed(MAX_DUTY);
+    vTaskDelay(pdMS_TO_TICKS(500));
+    stop_motors();
+}
+
+void turn_left() {
+    gpio_set_level(IN1, 0);
+    gpio_set_level(IN2, 1);
+    gpio_set_level(IN3, 1);
+    gpio_set_level(IN4, 0);
+    set_motor_speed(MAX_DUTY);
+    vTaskDelay(pdMS_TO_TICKS(500));
+    stop_motors();
+}
+
+// Calculating distance
+float getDistance() {
+    gpio_set_level(trigPin, 0);
+    ets_delay_us(2);
+    gpio_set_level(trigPin, 1);
+    ets_delay_us(10);
+    gpio_set_level(trigPin, 0);
+  
+    float duration = pulseIn(echoPin, HIGH);
+    float distance = (duration / 2.0) * 0.0343; // (cm)
+  
+    if (distance >= MAX_DISTANCE) {
+        return MAX_DISTANCE;
+    } else {
+        return distance;
+    }
+}
+
+void setup() {
+    Serial.begin(115200);
+  
+    // IR Sensor Setup
+    gpio_set_direction(FC1, GPIO_MODE_INPUT);
+    gpio_set_direction(FC2, GPIO_MODE_INPUT);
+    gpio_set_direction(FC3, GPIO_MODE_INPUT);
+  
+    // Ultrasonic Sensor Setup
+    gpio_set_direction(trigPin, GPIO_MODE_OUTPUT);
+    gpio_set_direction(echoPin, GPIO_MODE_INPUT);
+  
+    // Motor and Servo Setup
+    setup_motors();
+    servo_init();
+}
+
+void loop() {
+    FR = gpio_get_level(FC1);
+    FL = gpio_get_level(FC2);
+    BW = gpio_get_level(FC3);
+    distance = getDistance();
+  
+    if (distance < BlockDistance) {
+        block = 1;
+    } else {
+        block = 0;
+    }
+  
+    if (FR == 1 && FL == 1 && block == 0) {
+        // Vehicle runs straight forward
+        move_forward();
+    } else if (FR == 1 && FL == 0 && block == 0) {
+        // Vehicle moves slightly to the Right
+        turn_right();
+    } else if (FR == 0 && FL == 1 && block == 0) {
+        // Vehicle moves slightly to the Left
+        turn_left();
+    } else {
+        // Vehicle stop
+        stop_motors();
+        set_servo_angle(180); // Turn backward
+  
+        if (BW == 1 && block == 0) {
+            // Vehicle moves backward 10 cm
+            move_backward();
+            vTaskDelay(pdMS_TO_TICKS(1000)); // Adjust time as needed
+            stop_motors();
+  
+            // Servo turns right to check for obstacles
+            set_servo_angle(90);
+            if (FR == 1) {
+                // Vehicle runs forward
+                move_forward();
+            } else {
+                // Reverse back to the last stop location
+                // Servo turns left to check for obstacles
+                set_servo_angle(0);
+                if (FL == 1) {
+                    // Vehicle runs forward
+                    move_forward();
+                } else {
+                    // Vehicle stop
+                    stop_motors();
+                    ESP_LOGI("Robot", "Can't continue to drive.");
+                }
+            }
+        } else {
+            ESP_LOGI("Robot", "Can't continue to drive.");
+        }
+    }
+}
