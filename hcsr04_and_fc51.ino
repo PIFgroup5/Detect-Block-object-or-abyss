@@ -54,15 +54,15 @@ void loop() {
   }
   else
   {block = 0;}
-  if(FR == 1 && FL == 1 && block == 0)
+  if(FR == 0 && FL == 0 && block == 0)
   {
     //Vehicle run straight forward
   }
-  else if (FR == 1 && FL == 0 && block == 0)
+  else if (FR == 0 && FL == 1 && block == 0)
   {
     //Vehicle move slightly to the Right
   }
-  else if (FR == 0 && FL == 1 && block == 0)
+  else if (FR == 1 && FL == 0 && block == 0)
   {
     //Vehicle move slightly to the Left
   }
@@ -70,12 +70,12 @@ void loop() {
   {
     //Vehicle stop
     //Servo turn backward
-    if (BW == 1 && block == 0)
+    if (BW == 0 && block == 0)
     {
       //Vehicle backward 10 cm
       //Servo turn right to check if there are any block
       //if not then turn right,then:
-      if (FR == 1)
+      if (FR == 0)
       {
         //Vehicle run
       }
@@ -84,7 +84,7 @@ void loop() {
         //Reverse back to the last stop location
         //Servo turn left to check if there are any block
         //if not then turn left,then:
-        if (FL == 1)
+        if (FL == 0)
         {
           //Vehicle run
         }
