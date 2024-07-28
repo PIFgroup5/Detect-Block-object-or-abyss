@@ -19,7 +19,12 @@ Requirement:
 -1 HC-SR04
 -3 FC-51
 -5V Battery
-Addtional part:Servo (for rotate the HC-SR04-if you don't want then it's fine.)
+Addtional part:Servo (for rotate the HC-SR04-if you don't want then it's fine.),Motors or LED (based on what purpose)
+
+File:
+-hcsr04_and_fc51.ino:Template file.
+-motor + sensor:File that added the motors and servo.
+
 
 
 
