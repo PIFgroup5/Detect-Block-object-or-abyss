@@ -10,9 +10,13 @@
 </div>
 
 Detect object blocking the way of the vehicle or Abyss that can make the vehicle fall into and get damaged.
+</div>
 Detect object using HC-SR04.
+</div>
 Dectect Abyss using FC-51 IR Sensor.
+</div>
 Control using ESP32.
+</div>
 
 Requirement: 
 -1 ESP32
