@@ -27,7 +27,7 @@ Requirement:
 
 -1 HC-SR04
 
--3 FC-51
+-2 FC-51
 
 -5V Battery
 
