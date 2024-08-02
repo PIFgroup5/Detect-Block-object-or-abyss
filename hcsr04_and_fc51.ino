@@ -1,9 +1,11 @@
 //Connect GPIO
-#define FC1 20 //IR Sensor Front Left
-#define FC2 19 //IR Sensor Front Right
-#define FC3 18 //IR Sensor Back
-#define trigPin 9 // Acvtivate HC-SR04 Pin
-#define echoPin 10 // HC-SR04 Receiver pin
+#define FC1 (GPIO) //IR Sensor Front Left - Replace (GPIO) with your GPIO Number
+#define FC2 (GPIO) //IR Sensor Front Right - Replace (GPIO) with your GPIO Number
+#define FC3 (GPIO) //IR Sensor Back - Replace (GPIO) with your GPIO Number
+#define FC4 (GPIO) //IR Sensor Back Left-For Reverse - Replace (GPIO) with your GPIO Number
+#define FC5 (GPIO) //IR Sensor Back Right-For Reverse - Replace (GPIO) with your GPIO Number
+#define trigPin (GPIO) // Acvtivate HC-SR04 Pin - Replace (GPIO) with your GPIO Number
+#define echoPin (GPIO) // HC-SR04 Receiver pin - Replace (GPIO) with your GPIO Number
 //setup servo (if needed)
 //Setup motor (if needed)
 
@@ -12,6 +14,8 @@
 int FR = 0; //Front Right IR Sensor
 int FL = 0; //Front Left IR Sensor
 int BW = 0; //Back IR Sensor
+int RL = 0; //Reverse Left IR Sensor
+int RR = 0; //Reverse Right IR Sensor
 int block = 0; //HC-SR04 Sensor
 
 //Store location
@@ -35,6 +39,8 @@ void setup() {
   pinMode(FC1,INPUT);
   pinMode(FC2,INPUT);
   pinMode(FC3,INPUT);
+  pinMode(FC4,INPUT);
+  pinMode(FC5,INPUT);
   //HC-SR04 Setup
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
@@ -47,6 +53,8 @@ void loop() {
   FR = digitalRead(FC1);
   FL = digitalRead(FC2);
   BW = digitalRead(FC3);
+  RL = digitalRead(FC4);
+  RR = digitalRead(FC5);
     distance = getDistance();
   if (distance < BlockDistance) 
   {
@@ -69,8 +77,7 @@ void loop() {
   else
   {
     //Vehicle stop
-    //Servo turn backward
-    if (BW == 0 && block == 0)
+    if (BW == 0 && RL == 0 && RR == 0)
     {
       //Vehicle backward 10 cm
       //Servo turn right to check if there are any block
